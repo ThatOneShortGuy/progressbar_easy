@@ -45,7 +45,7 @@ class ProgressBar(object):
     def __iadd__(self, other):
         a = ProgressBar(self.items, self.completed, self.maxlen, self.char,
                         self.show_on_update, self.items_per_sec, self.last_time, self.lr)
-        a.update(self.completed + other)
+        a.update(other)
         return a
 
     def format_time(self):
