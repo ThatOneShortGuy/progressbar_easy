@@ -2,6 +2,7 @@
 
 ## 1.0.4 (6/11/2021)
 - Added "__iter__" attribute to allow for more effective use in loops.
+
 ### Example:
 ```Python
 for i in ProgressBar(range(10)):

@@ -18,7 +18,8 @@ Prefer `bar.update()`
 
 ## Or
 Use as an iterator object
-```python
+
+```Python
 for i in ProgressBar(range(10)):
     ...
 ```
