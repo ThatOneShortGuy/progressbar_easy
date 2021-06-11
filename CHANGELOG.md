@@ -7,8 +7,6 @@
 for i in ProgressBar(range(10)):
     ...
 ```
-Yields:
-- 1/10 10.0 % [██                       ] Eta: 0:00:00 | 27027.93 items/s
 
 ## 1.0.3.3 (6/8/2021)
 - Bug Fixes
