@@ -10,9 +10,13 @@ import sys
 
 
 class ProgressBar(object):
-    def __init__(self, items=None, completed=0, maxlen=25, char='█', show_on_update=True, ips=1, lsttime=None, learning_rate=.1):
+    def __init__(self, items=None, completed=0, maxlen=25, char='█', show_on_update=True, ips=1, lsttime=None, lr=.1):
         self.completed = completed
-        self.items = items
+        if hasattr(items, '__iter__'):
+            self.items = len(items)
+            self.enums = items
+        else:
+            self.items = items
         self.maxlen = maxlen
         self.pos = 0
         self.char = char
@@ -20,8 +24,8 @@ class ProgressBar(object):
         if lsttime:
             self.last_time = lsttime
         else:
-            self.last_time = time.time()
-        self.lr = learning_rate
+            self.last_time = time.perf_counter()
+        self.lr = lr
         self.show_on_update = show_on_update
 
     def __repr__(self):
@@ -41,6 +45,11 @@ class ProgressBar(object):
 
     def __div__(self, other):
         return self.completed / other
+
+    def __iter__(self):
+        for i in range(self.items):
+            self.update()
+            yield self.enums[i]
 
     def __iadd__(self, other):
         a = ProgressBar(self.items, self.completed, self.maxlen, self.char,
@@ -70,11 +79,11 @@ class ProgressBar(object):
     def update(self, n=1):
         completed = self.completed + n
         if self.items:
-            t = time.time() - self.last_time
+            t = time.perf_counter() - self.last_time
             if t != 0 or completed == self.completed:
                 comp = completed - self.completed
                 self.items_per_sec += self.lr * (comp/t - self.items_per_sec)
-                self.last_time = time.time()
+                self.last_time = time.perf_counter()
                 self.completed = completed
                 self.pos = completed/self.items
             elif completed == self.items:
@@ -87,6 +96,5 @@ class ProgressBar(object):
 
 
 if __name__ == '__main__':
-    prog = ProgressBar(10000, show_on_update=True, ips=1.5)
-    for i in range(prog.items):
-        prog.update(i+1)
+    for i in ProgressBar(range(10)):
+        print(i)

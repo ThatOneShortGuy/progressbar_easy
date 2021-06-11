@@ -15,3 +15,10 @@ Initialize object with `bar = ProgressBar(number of iterations)`
 
 Use in loop. Inside loop at the end, put `bar.update()` or `bar += 1`.
 Prefer `bar.update()`
+
+## Or
+Use as an iterator object
+```python
+for i in ProgressBar(range(10)):
+    ...
+```

@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.0.4 (6/11/2021)
+- Added "__iter__" attribute to allow for more effective use in loops.
+### Example:
+```Python
+for i in ProgressBar(range(10)):
+    ...
+```
+Yields:
+- 1/10 10.0 % [██                       ] Eta: 0:00:00 | 27027.93 items/s
+
 ## 1.0.3.3 (6/8/2021)
 - Bug Fixes
 
