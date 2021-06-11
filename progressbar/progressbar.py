@@ -24,7 +24,7 @@ class ProgressBar(object):
         if lsttime:
             self.last_time = lsttime
         else:
-            self.last_time = time.perf_counter()
+            self.last_time = 0
         self.lr = lr
         self.show_on_update = show_on_update
 
@@ -72,14 +72,17 @@ class ProgressBar(object):
                 st += str(round(1/ips, 2)) + ' s/item'
 
         sys.stdout.write(
-            f'\r{f"{str(self.completed).rjust(int(log(50,10)+.5))}/{self.items}" if self.items else ""} \
+            f'\r{f"{str(self.completed).rjust(int(log(self.items,10)+.5))}/{self.items}" if self.items else ""} \
 {str(round(self.pos*100,2)).ljust(5)}% \
 [{(self.char*int(self.pos*self.maxlen)).ljust(self.maxlen)}] {st}\t')
 
     def update(self, n=1):
         completed = self.completed + n
         if self.items:
-            t = time.perf_counter() - self.last_time
+            if not self.last_time:
+                t = self.ips
+            else:
+                t = time.perf_counter() - self.last_time
             if t != 0 or completed == self.completed:
                 comp = completed - self.completed
                 self.items_per_sec += self.lr * (comp/t - self.items_per_sec)
@@ -96,5 +99,5 @@ class ProgressBar(object):
 
 
 if __name__ == '__main__':
-    for i in ProgressBar(range(10)):
-        print(i)
+    for i in ProgressBar(range(2000)):
+        time.sleep(5)
