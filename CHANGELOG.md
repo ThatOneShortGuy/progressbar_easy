@@ -1,5 +1,8 @@
 # Change Log
 
+## 1.0.4.4 (6/11/2021)
+- Bug Fixes
+
 ## 1.0.4 (6/11/2021)
 - Added "__iter__" attribute to allow for more effective use in loops.
 
