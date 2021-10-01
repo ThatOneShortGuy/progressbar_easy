@@ -4,6 +4,7 @@ This is a simple progress bar that allows for easy use to display progress.
 # FEATURES
 - Timer to estimate time remaining
 - Timer adjusts to rates
+- Learning rate can be changed
 - Choice of length of bar
 - Choice of character bar is made of
 - Option for item count or percentage completed (or both)
@@ -20,6 +21,6 @@ Prefer `bar.update()`
 Use as an iterator object
 
 ```Python
-for i in ProgressBar(range(10)):
+for i in ProgressBar(range(100), lr=.0001):
     ...
 ```
