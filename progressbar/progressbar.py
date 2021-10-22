@@ -114,7 +114,7 @@ class ProgressBar:
         '''
         completed = self.completed + n
         if self.items:
-            t = time.perf_counter() - self.last_time if self.last_time else self.ips
+            t = time.perf_counter() - self.last_time if self.last_time else self.items_per_sec
             if t != 0 or completed == self.completed:
                 if self.use_average:
                     self.times[self.average_count] = t
