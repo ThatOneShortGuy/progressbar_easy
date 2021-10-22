@@ -1,7 +1,7 @@
 # Progress Bar
 This is a simple progress bar that allows for easy use to display progress.
 
-# FEATURES
+# Features
 - Timer to estimate time remaining
 - Timer adjusts to rates
 - Learning rate can be changed
@@ -10,8 +10,8 @@ This is a simple progress bar that allows for easy use to display progress.
 - Option for item count or percentage completed (or both)
 - Option for method of computing completion time.
 
-# INSTALLATION
-Install with pip: pip install progressbar_easy
+# Installation
+Install with pip: `pip install progressbar_easy`
 
 # Usage
 Imported with `from progressbar import ProgressBar`
