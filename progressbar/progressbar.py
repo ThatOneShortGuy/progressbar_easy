@@ -1,16 +1,39 @@
-# -*- coding: utf-8 -*-
 """
 Created on Tue May  4 15:59:03 2021
 
-@author: braxt
+@author: Braxton Brown
 """
 from math import log
 import time
 import sys
 
 
-class ProgressBar(object):
-    def __init__(self, items=None, completed=0, maxlen=25, char='█', show_on_update=True, ips=1, lsttime=None, lr=.1):
+class ProgressBar:
+    def __init__(self, items, completed=0, maxlen=25, char='█', show_on_update=True, ips=1, lsttime=None, lr=0.1, use_average=(False, 1000)):
+        '''
+        Progress Bar that shows usefull information about the progress of a task.
+
+        Parameters
+        ----------
+        items : int
+            The number of items to be completed.
+        completed : int, optional
+            The number of items that have been completed. Defaults to 0.
+        maxlen : int, optional
+            The maximum length of the progress bar. The default is 25.
+        char : str, optional
+            The character to be used for the progress bar. The default is '█'.
+        show_on_update : bool, optional
+            Whether or not to show the progress bar when updating. The default is True.
+        ips : float, optional
+            The initial items per second. The default is 1.
+        lsttime : float, optional
+            The last time the progress bar was updated. The default is None.
+        lr : float, optional
+            The learning rate. The default is 0.1.
+        use_average[use_average, number of times to save] : iterable, optional
+            Whether or not to use the average of the items per second. The default is (False, 1000).
+        '''
         self.completed = completed
         if hasattr(items, '__iter__'):
             self.items = len(items)
@@ -21,12 +44,15 @@ class ProgressBar(object):
         self.pos = 0
         self.char = char
         self.items_per_sec = ips
-        if lsttime:
-            self.last_time = lsttime
-        else:
-            self.last_time = 0
+        self.last_time = lsttime or 0
         self.lr = lr
         self.show_on_update = show_on_update
+        if use_average[0]:
+            self.use_average = use_average
+            self.times = [None for i in range(use_average[1])]
+            self.average_count = 0
+        else:
+            self.use_average = False
 
     def __repr__(self):
         return str(self.pos)
@@ -52,24 +78,25 @@ class ProgressBar(object):
             yield self.enums[i]
 
     def __iadd__(self, other):
-        a = ProgressBar(self.items, self.completed, self.maxlen, self.char,
-                        self.show_on_update, self.items_per_sec, self.last_time, self.lr)
-        a.update(other)
-        return a
+        self.update(other)
+        return self
 
     def format_time(self):
+        '''
+        Formats the time left to completion in format hh:mm:ss.
+        '''
         secs = (self.items-self.completed)/self.items_per_sec
-        return f'{int(secs//3600)}:{str(int(secs//60)%60).zfill(2)}:{str(int(secs%60)).zfill(2)} '
+        return f'{int(secs//3600)}:{(secs//60)%60:02}:{int(secs%60):02} '
 
     def show(self):
+        '''
+        Shows the progress bar.
+        '''
         st = ''
         if self.items:
             st = 'Eta: ' + self.format_time() + '| '
             ips = self.items_per_sec
-            if ips > 1:
-                st += str(round(ips, 2)) + ' items/s'
-            else:
-                st += str(round(1/ips, 2)) + ' s/item'
+            st += str(round(ips, 2)) + ' items/s' if ips > 1 else str(round(1/ips, 2)) + ' s/item'
 
         sys.stdout.write(
             f'\r{f"{str(self.completed).rjust(int(log(self.items,10)+.5))}/{self.items}" if self.items else ""} \
@@ -77,15 +104,25 @@ class ProgressBar(object):
 [{(self.char*int(self.pos*self.maxlen)).ljust(self.maxlen)}] {st}\t')
 
     def update(self, n=1):
+        '''
+        Updates the progress bar.
+
+        Parameters
+        ----------
+        n : int, optional
+            The number of items completed since previous call. Defaults to 1.
+        '''
         completed = self.completed + n
         if self.items:
-            if not self.last_time:
-                t = self.ips
-            else:
-                t = time.perf_counter() - self.last_time
+            t = time.perf_counter() - self.last_time if self.last_time else self.ips
             if t != 0 or completed == self.completed:
-                comp = completed - self.completed
-                self.items_per_sec += self.lr * (comp/t - self.items_per_sec)
+                if self.use_average:
+                    self.times[self.average_count] = t
+                    self.average_count += 1
+                    self.average_count %= self.use_average[1]
+                    self.items_per_sec = sum(self.times[:min(self.items, len(self.times))])/self.use_average[1]
+                else:
+                    self.items_per_sec += self.lr * (n/t - self.items_per_sec)
                 self.last_time = time.perf_counter()
                 self.completed = completed
                 self.pos = completed/self.items
@@ -100,4 +137,4 @@ class ProgressBar(object):
 
 if __name__ == '__main__':
     for i in ProgressBar(range(2000)):
-        time.sleep(5)
+        time.sleep(.69)
