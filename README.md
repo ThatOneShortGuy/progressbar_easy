@@ -23,6 +23,7 @@ Prefer `bar.update(K)` if you want to update the bar every iteration.
 
 Defaults to use the Bellman equation to estimate time remaining.
 Add `use_average=(True, N)` arguement to use the average of the last N iterations instead of Bellman equation.
+
 Example: `bar = ProgressBar(range(2000), use_average=(True, 420)):`
 
 ## Or
