@@ -1,5 +1,11 @@
 # Change Log
 
+## 1.1.0 (10/22/2021)
+- Added ability to use the average time to estimate future time.
+- Added docstrings.
+- Improved performance when using "+=" opperator.
+- Increased efficiency of object.
+
 ## 1.0.4.4 (6/11/2021)
 - Bug Fixes
 
