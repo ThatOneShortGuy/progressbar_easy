@@ -120,7 +120,7 @@ class ProgressBar:
                     self.times[self.average_count] = t
                     self.average_count += 1
                     self.average_count %= self.use_average[1]
-                    self.items_per_sec = sum(self.times[:min(self.items, len(self.times))])/self.use_average[1]
+                    self.items_per_sec = sum(self.times[:min(completed, len(self.times))])/min(completed, len(self.times))
                 else:
                     self.items_per_sec += self.lr * (n/t - self.items_per_sec)
                 self.last_time = time.perf_counter()
@@ -136,5 +136,5 @@ class ProgressBar:
 
 
 if __name__ == '__main__':
-    for i in ProgressBar(range(2000)):
+    for i in ProgressBar(range(2000), use_average=(True, 100)):
         time.sleep(.69)
