@@ -86,7 +86,7 @@ class ProgressBar:
         Formats the time left to completion in format hh:mm:ss.
         '''
         secs = (self.items-self.completed)/self.items_per_sec
-        return f'{int(secs//3600)}:{(secs//60)%60:02}:{int(secs%60):02} '
+        return f'{int(secs//3600)}:{int(secs//60)%60:02}:{int(secs%60):02} '
 
     def show(self):
         '''
