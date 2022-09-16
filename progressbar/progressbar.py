@@ -6,10 +6,11 @@ Created on Tue May  4 15:59:03 2021
 from math import log
 import time
 import sys
+from types import GeneratorType
 
 
 class ProgressBar:
-    def __init__(self, items, completed=0, maxlen=25, char='█', show_on_update=True, ips=1, lsttime=None, lr=0.1, use_average=(False, 1000)):
+    def __init__(self, items, completed=0, maxlen=25, char='█', show_on_update=True, ips=1, lsttime=None, lr=0.1, use_average=0):
         '''
         Progress Bar that shows usefull information about the progress of a task.
 
@@ -31,15 +32,16 @@ class ProgressBar:
             The last time the progress bar was updated. The default is None.
         lr : float, optional
             The learning rate. The default is 0.1.
-        use_average[use_average, number of times to save] : iterable, optional
-            Whether or not to use the average of the items per second. The default is (False, 1000).
+        use_average: int, optional
+            Whether or not to use the average of the items per second. The default is 0. If use_average is an int, it is the number of items to use.
         '''
         self.completed = completed
-        if hasattr(items, '__iter__'):
+        if hasattr(items, '__iter__') and not isinstance(items, GeneratorType):
             self.items = len(items)
             self.enums = items
         else:
-            self.items = items
+            self.items = 1
+            self.enums = items
         self.maxlen = maxlen
         self.pos = 0
         self.char = char
@@ -47,12 +49,9 @@ class ProgressBar:
         self.last_time = lsttime or 0
         self.lr = lr
         self.show_on_update = show_on_update
-        if use_average[0]:
-            self.use_average = use_average
-            self.times = [None for i in range(use_average[1])]
-            self.average_count = 0
-        else:
-            self.use_average = False
+        self.use_average = bool(use_average)
+        self.times = [None] * use_average
+        self.average_count = 0
 
     def __repr__(self):
         return str(self.pos)
@@ -73,9 +72,10 @@ class ProgressBar:
         return self.completed / other
 
     def __iter__(self):
-        for i in range(self.items):
+        for i in self.enums:
             self.update()
-            yield self.enums[i]
+            yield i
+        print()
 
     def __iadd__(self, other):
         self.update(other)
@@ -92,6 +92,10 @@ class ProgressBar:
         '''
         Shows the progress bar.
         '''
+        if self.items == 1:
+            ips = self.items_per_sec
+            sys.stdout.write(f'\r{self.completed} | {str(round(ips, 2)) + "items/s" if ips > 1 else str(round(1/ips, 2)) + "s/items"}\t')
+            return
         st = ''
         if self.items:
             st = 'Eta: ' + self.format_time() + '| '
@@ -119,16 +123,16 @@ class ProgressBar:
                 if self.use_average:
                     self.times[self.average_count] = t
                     self.average_count += 1
-                    self.average_count %= self.use_average[1]
-                    self.items_per_sec = sum(self.times[:min(completed, len(self.times))])/min(completed, len(self.times))
+                    self.average_count %= len(self.times)
+                    self.items_per_sec = min(completed, len(self.times))/sum(self.times[:min(completed, len(self.times))])
                 else:
                     self.items_per_sec += self.lr * (n/t - self.items_per_sec)
                 self.last_time = time.perf_counter()
                 self.completed = completed
-                self.pos = completed/self.items
+                self.pos = completed/self.items if self.items else .01
             elif completed == self.items:
                 self.completed = completed
-                self.pos = completed/self.items
+                self.pos = completed/self.items if self.items else .01
         else:
             self.pos = completed
         if self.show_on_update:
@@ -136,5 +140,9 @@ class ProgressBar:
 
 
 if __name__ == '__main__':
-    for i in ProgressBar(range(2000), use_average=(True, 100)):
-        time.sleep(.69)
+    a = (i for i in range(10))
+    for i in ProgressBar(range(100), use_average=10):
+        time.sleep(.02)
+
+    for i in ProgressBar(a):
+        time.sleep(.2)

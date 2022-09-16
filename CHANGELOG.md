@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.1.2 (8/18/2022)
+- Fixed bug with use_average option where the speed was inverted.
+- Removed redundant use_average set to true or false. It is now always true, but the user needs chose how many frames to average.
+
+## 1.1.1 (4/21/2022)
+- Added ability to use generators
+
 ## 1.1.0 (10/22/2021)
 - Added ability to use the average time to estimate future time.
 - Added docstrings.
